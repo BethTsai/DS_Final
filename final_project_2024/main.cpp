@@ -1,13 +1,26 @@
 #define FILE_EXTENSION ".txt"
-#include<fstream>
-#include<string>
-#include<cstring>
-#include<vector>
-#include<iostream>
-
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+#include <set>
+#include <iostream>
+#include "trie.hpp"
+namespace fs = std::filesystem;
 using namespace std;
 
 // Utility Func
+vector<string> getTextFiles(const string& directory) {
+    vector<string> files;
+    for(const auto& entry : fs::directory_iterator(directory)) {
+        if(entry.path().extension() == FILE_EXTENSION) {
+            files.push_back(entry.path().string());
+        }
+    }
+    return files;
+}
 
 // string parser : output vector of strings (words) after parsing
 vector<string> word_parse(vector<string> tmp_string){
@@ -36,16 +49,32 @@ vector<string> split(const string& str, const string& delim) {
 	char *p = strtok(strs, d);
 	while(p) {
 		string s = p; 
-		res.push_back(s); 
+		res.push_back(s);
 		p = strtok(NULL, d);
 	}
 
 	return res;
 }
 
+set<int> find_set(string &str, Trie *trie){
+	set<int> tmp;
+	if(str[0] == '\"'){
+		tmp = trie->find_exact(str.substr(1, str.size()-2));
+	}
+	else if(str[0] == '*'){
+		tmp = trie->find_suf(str.substr(1, str.size()-2));
+	}
+	else if(isalpha(str[0])){
+		tmp = trie->find_pre(str);
+	}
+	else if(str[0] == '<'){
+		tmp = {0, 1};
+	}
+	return tmp;
+}
 
-int main(int argc, char *argv[])
-{
+
+int main(int argc, char *argv[]){
 
     // INPUT :
 	// 1. data directory in data folder
@@ -62,6 +91,7 @@ int main(int argc, char *argv[])
 		cout << "Error to open output file\n";
 		return 0;
 	}
+	cout << "Output file opened\n";
 
 	// Read File & Parser Example
 
@@ -71,34 +101,120 @@ int main(int argc, char *argv[])
 
 	// from data_dir get file ....
 	// eg : use 0.txt in data directory
-	fi.open("data/20.txt", ios::in);
+	// fi.open("data/53.txt", ios::in);
+	vector<string> textFiles = getTextFiles(data_dir);
+	vector<string> Article_title;
+	Article_title.resize(10010);
 
-    // GET TITLENAME
-	getline(fi, title_name);
+	Trie trie;
+    // Process each file
+    for(const auto& filepath : textFiles){
+        fi.open(filepath, ios::in);
+        if(!fi.is_open()){
+            cerr << "Failed to open: " << filepath << endl;
+            continue;
+        }
+		// Extract file name without extension
+		string filename = fs::path(filepath).stem().string();
+		int fileIndex = stoi(filename);
 
-    // GET TITLENAME WORD ARRAY
-    tmp_string = split(title_name, " ");
+        // GET TITLENAME
+        getline(fi, title_name);
+        Article_title[fileIndex] = title_name;
+        
+		// GET TITLENAME WORD ARRAY
+		tmp_string = split(title_name, " ");
+		vector<string> title = word_parse(tmp_string);
+		for(const auto& word : title){
+			trie.insert(word, fileIndex);
+		}
 
-	vector<string> title = word_parse(tmp_string);
+		// GET CONTENT LINE BY LINE
+		while(getline(fi, tmp)){
+			// GET CONTENT WORD VECTOR
+			tmp_string = split(tmp, " ");
 
-	for(auto &word : title){
-		outputFile << word << endl;
+			// PARSE CONTENT
+			vector<string> content = word_parse(tmp_string);
+
+			for(auto &word : content){
+				trie.insert(word, fileIndex);
+			}
+		}
+        fi.close();
+    }
+	cout << "Trie built\n";
+
+	// OPEN query.txt
+	fi.open(query, ios::in);
+	if(!fi.is_open()){
+		cerr << "Failed to open: " << query << endl;
 	}
-
-    // GET CONTENT LINE BY LINE
 	while(getline(fi, tmp)){
-
-        // GET CONTENT WORD VECTOR
 		tmp_string = split(tmp, " ");
 
-		// PARSE CONTENT
-		vector<string> content = word_parse(tmp_string);
+		// for(auto s : tmp_string)	cout << s << "\n";
 
-		for(auto &word : content){
-			outputFile << word << endl;
+
+		set<int> answer, tmp_set, b;
+		answer = find_set(tmp_string[0], &trie);
+		for(int i = 1; i < tmp_string.size(); i++){
+			cout << tmp_string[i] << "\n";
+			if(tmp_string[i] == "+"){
+				tmp_set = find_set(tmp_string[i+1], &trie);
+				b = set_intersection(answer, tmp_set);
+				answer = b;
+				i++;
+			}
+			else if(tmp_string[i] == "-"){
+				tmp_set = find_set(tmp_string[i+1], &trie);
+				b = set_union(answer, tmp_set);
+				answer = b;
+				i++;
+			}
+			else if(tmp_string[i] == "/"){
+				tmp_set = find_set(tmp_string[i+1], &trie);
+				b = set_difference(answer, tmp_set);
+				answer = b;
+				i++;
+			}
 		}
-		//......
+		if(answer.empty()){
+			outputFile << "Not Found!\n";
+			continue;
+		}
+		for(auto &index : answer){
+			outputFile << Article_title[index] << "\n";
+		}
+		answer.clear();
 	}
+	cout << "Query processed\n";
+	// fi.open("data/53.txt", ios::in);
+    // // GET TITLENAME
+	// getline(fi, title_name);
+
+    // // GET TITLENAME WORD ARRAY
+    // tmp_string = split(title_name, " ");
+	// vector<string> title = word_parse(tmp_string);
+
+	// for(auto &word : title){
+	// 	cout << word << " ";
+	// }
+
+    // // GET CONTENT LINE BY LINE
+	// while(getline(fi, tmp)){
+
+    //     // GET CONTENT WORD VECTOR
+	// 	tmp_string = split(tmp, " ");
+
+	// 	// PARSE CONTENT
+	// 	vector<string> content = word_parse(tmp_string);
+
+	// 	for(auto &word : content){
+	// 		outputFile << word << endl;
+	// 	}
+	// 	//......
+	// }
 
     // CLOSE FILE
 	fi.close();
