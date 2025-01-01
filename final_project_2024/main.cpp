@@ -6,7 +6,9 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include "function.hpp"
 #include "trie.hpp"
+#define DATA_SIZE 10100
 namespace fs = std::filesystem;
 using namespace std;
 
@@ -40,6 +42,7 @@ set<int> find_set(string &str, Trie *trie){
 
 
 int main(int argc, char *argv[]){
+	ios::sync_with_stdio(0);
 
     // INPUT :
 	// 1. data directory in data folder
@@ -69,7 +72,7 @@ int main(int argc, char *argv[]){
 
 	vector<string> textFiles = getTextFiles(data_dir);
 	vector<string> Article_title;
-	Article_title.resize(10010);
+	Article_title.resize(DATA_SIZE);
 
 	Trie trie;
     // Process each file
@@ -108,13 +111,15 @@ int main(int argc, char *argv[]){
 		}
         fi.close();
     }
-	cout << "Trie built\n";
 
+	cout << "Trie built\n";
+	
 	// OPEN query.txt
 	fi.open(query, ios::in);
 	if(!fi.is_open()){
 		cerr << "Failed to open: " << query << endl;
 	}
+
 	while(getline(fi, tmp)){
 		tmp_string = split(tmp, " ");
 
