@@ -1,0 +1,1 @@
+Powershell.exe Measure-Command { ./main.exe data-more query_more.txt outputmore.txt}
