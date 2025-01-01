@@ -13,6 +13,7 @@ namespace my {
 };
 
 vector<string> split(const string& str, const string& delim);
+vector<string> word_parse(vector<string> tmp_string);
 
 struct Mark{
 	set<int> title;
@@ -283,6 +284,19 @@ set<int> my::set_difference(const set<int> &a, const set<int> &b){
 		}
 	}
 	return tmp;
+}
+// string parser : output vector of strings (words) after parsing
+vector<string> word_parse(vector<string> tmp_string){
+	vector<string> parse_string;
+	for(auto& word : tmp_string){
+		string new_str;
+    	for(auto &ch : word){
+			if(isalpha(ch))
+				new_str.push_back(ch);
+		}
+		parse_string.emplace_back(new_str);
+	}
+	return parse_string;
 }
 
 vector<string> split(const string& str, const string& delim) {
