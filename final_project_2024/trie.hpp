@@ -13,7 +13,7 @@ namespace my {
 };
 
 vector<string> split(const string& str, const string& delim);
-vector<string> word_parse(vector<string> tmp_string);
+vector<string> word_parse(const vector<string> &tmp_string);
 
 struct Mark{
 	set<int> title;
@@ -39,11 +39,11 @@ public:
 	set<int> find_exact(string str);
 	set<int> find_pre(string str);
 	set<int> find_suf(string str);
-	set<int> find_wildcard(string str);
+	set<int> find_wildcard(string &str);
 	set<int> find_child(Node *root);
 
-	set<Node*> find_substr(Node *root, string str, int idx);
-	Node* find_prefix_node(string str);
+	set<Node*> find_substr(Node *root, string &str, int idx);
+	Node* find_prefix_node(string &str);
 	void insert(string str, int label);
 	Trie(){
 		pre_root = new Node;
@@ -102,7 +102,7 @@ set<int> Trie::find_exact(string str){
 		finding = finding->child[str_data];
 	}
 	if(finding != nullptr && finding->ptr != nullptr){
-		tmp = finding->ptr->title;
+		tmp = move(finding->ptr->title);
 	}
 	return tmp;
 }
@@ -138,7 +138,7 @@ set<int> Trie::find_suf(string str){
 	}
 	return find_child(finding);
 }
-set<int> Trie::find_wildcard(string str){
+set<int> Trie::find_wildcard(string &str){
 	int len = str.size();
 	vector<string> tmp_string;
 	tmp_string = split(str.substr(1, len-2), "*");
@@ -164,7 +164,7 @@ set<int> Trie::find_wildcard(string str){
 
 			for(auto &root : all_sets){
 				if(str[len-2] == '*'){
-					tb = this->find_child(root);
+					tb = move(this->find_child(root));
 					ans = move(my::set_union(ans, tb));
 				}
 				else if(str[len-2] != '*' && root->ptr != nullptr){
@@ -173,12 +173,12 @@ set<int> Trie::find_wildcard(string str){
 			}
 		}
 		else{
-			ans = this->find_pre(tmp_string[0]);
+			ans = move(this->find_pre(tmp_string[0]));
 		}
 	}
 	else if(str[1] == '*'){
 		start_node = this->pre_root;
-		all_sets = this->find_substr(start_node, *begin, 0);
+		all_sets = move(this->find_substr(start_node, *begin, 0));
 
 		for(int i = 1; i < tmp_str_len; i++){
 			for(auto &node : all_sets){
@@ -190,7 +190,7 @@ set<int> Trie::find_wildcard(string str){
 
 		for(auto &root : all_sets){
 			if(str[len-2] == '*'){
-				tb = this->find_child(root);
+				tb = move(this->find_child(root));
 				ans = move(my::set_union(ans, tb));
 			}
 			else if(str[len-2] != '*' && root->ptr != nullptr){
@@ -204,21 +204,21 @@ set<int> Trie::find_wildcard(string str){
 set<int> Trie::find_child(Node *root){
 	set<int> all_sets, tmp;
 	if(root->ptr != nullptr){
-		all_sets = root->ptr->title;
+		all_sets = move(root->ptr->title);
 	}
 	for(int i = 0; i < 26; i++){
 		if(root->child[i] == nullptr){
 			continue;
 		}
-		set<int> b = find_child(root->child[i]);
-		tmp = my::set_union(all_sets, b);
+		set<int> b = move(find_child(root->child[i]));
+		tmp = move(my::set_union(all_sets, b));
 		all_sets = move(tmp);
 	}
 	return all_sets;
 }
 
 
-set<Node*> Trie::find_substr(Node *root, string str, int idx){
+set<Node*> Trie::find_substr(Node *root, string &str, int idx){
 	set<Node *> all_sets, tmp;
 	int str_data = (str[idx] >= 'A' && str[idx] <= 'Z') ? str[idx] - 'A' : str[idx] - 'a';
 	if(str.size() == idx){
@@ -226,13 +226,13 @@ set<Node*> Trie::find_substr(Node *root, string str, int idx){
 	}
 	for(int i = 0; i < 26; i++){
 		if(root->child[i] != nullptr && i == str_data){
-			tmp = find_substr(root->child[i], str, idx+1);
+			tmp = move(find_substr(root->child[i], str, idx+1));
 		}
 		for(auto &i : tmp){
 			all_sets.insert(i);
 		}
 		if(root->child[i] != nullptr && idx == 0){
-			tmp = find_substr(root->child[i], str, 0);
+			tmp = move(find_substr(root->child[i], str, 0));
 		}
 		for(auto &i : tmp){
 			all_sets.insert(i);
@@ -241,7 +241,7 @@ set<Node*> Trie::find_substr(Node *root, string str, int idx){
 	return all_sets;
 }
 
-Node* Trie::find_prefix_node(string str){
+Node* Trie::find_prefix_node(string &str){
 	int len = size(str);
 	int str_data;
 	Node *finding;
@@ -286,7 +286,7 @@ set<int> my::set_difference(const set<int> &a, const set<int> &b){
 	return tmp;
 }
 // string parser : output vector of strings (words) after parsing
-vector<string> word_parse(vector<string> tmp_string){
+vector<string> word_parse(const vector<string> &tmp_string){
 	vector<string> parse_string;
 	for(auto& word : tmp_string){
 		string new_str;

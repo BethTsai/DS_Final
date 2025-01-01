@@ -24,16 +24,16 @@ vector<string> getTextFiles(const string& directory) {
 set<int> find_set(string &str, Trie *trie){
 	set<int> tmp;
 	if(str[0] == '\"'){
-		tmp = trie->find_exact(str.substr(1, str.size()-2));
+		tmp = move(trie->find_exact(str.substr(1, str.size()-2)));
 	}
 	else if(str[0] == '*'){
-		tmp = trie->find_suf(str.substr(1, str.size()-2));
+		tmp = move(trie->find_suf(str.substr(1, str.size()-2)));
 	}
 	else if(isalpha(str[0])){
-		tmp = trie->find_pre(str);
+		tmp = move(trie->find_pre(str));
 	}
 	else if(str[0] == '<'){
-		tmp = trie->find_wildcard(str);
+		tmp = move(trie->find_wildcard(str));
 	}
 	return tmp;
 }
@@ -123,21 +123,18 @@ int main(int argc, char *argv[]){
 		for(int i = 1; i < tmp_string.size(); i++){
 
 			if(tmp_string[i] == "+"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_intersection(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_intersection(answer, tmp_set));
 				i++;
 			}
 			else if(tmp_string[i] == "-"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_difference(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_difference(answer, tmp_set));
 				i++;
 			}
 			else if(tmp_string[i] == "/"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_union(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_union(answer, tmp_set));
 				i++;
 			}
 		}
