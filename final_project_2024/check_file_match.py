@@ -33,6 +33,6 @@ def compare_files(file1_path, file2_path):
         print(f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
-    file1_path = "query.txt"
-    file2_path = "query_output.txt"
+    file1_path = "output_more.txt"
+    file2_path = "query_more_output.txt"
     compare_files(file1_path, file2_path)
