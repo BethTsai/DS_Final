@@ -4,7 +4,6 @@
 #include <string>
 #include <cstring>
 #include <vector>
-#include <algorithm>
 #include <set>
 #include <iostream>
 #include "trie.hpp"
@@ -68,7 +67,44 @@ set<int> find_set(string &str, Trie *trie){
 		tmp = trie->find_pre(str);
 	}
 	else if(str[0] == '<'){
-		tmp = {0, 1};
+		set<int> tmpa, tmpb;
+		int len = str.size();
+		vector<string> tmp_string;
+		tmp_string = split(str.substr(1, len-2), "*");
+		int tmp_string_size = tmp_string.size();
+		
+		if(str[1] == '*' && str[len-2] == '*'){
+			tmp = trie->find_wildcard(tmp_string.begin(), tmp_string.end());
+		}
+		else if(str[1] != '*' && str[len-2] == '*'){
+			if(tmp_string_size > 1){
+				tmpa = trie->find_pre(tmp_string[0]);
+				tmpb = trie->find_wildcard(tmp_string.begin()+1, tmp_string.end());
+				tmp = move(my::set_intersection(tmpa, tmpb));
+			}
+			else{
+				tmp = trie->find_pre(tmp_string[0]);
+			}
+		}
+		else if(str[1] == '*' && str[len-2] != '*'){
+			if(tmp_string_size > 1){
+				tmpa = trie->find_suf(tmp_string[tmp_string_size-1]);
+				tmpb = trie->find_wildcard(tmp_string.begin(), tmp_string.end()-1);
+				tmp = move(my::set_intersection(tmpa, tmpb));
+			}
+			else{
+				tmp = trie->find_suf(tmp_string[tmp_string_size-1]);
+			}
+		}
+		else if(str[1] != '*' && str[len-2] != '*'){
+			tmpa = trie->find_pre(tmp_string[0]);
+			tmpb = trie->find_suf(tmp_string[tmp_string_size-1]);
+			tmp = move(my::set_intersection(tmpa, tmpb));
+			if(tmp_string_size > 2){
+				tmpa = trie->find_wildcard(tmp_string.begin()+1, tmp_string.end()-1);
+				tmp = move(my::set_intersection(tmp, tmpa));
+			}
+		}
 	}
 	return tmp;
 }
@@ -162,19 +198,19 @@ int main(int argc, char *argv[]){
 			cout << tmp_string[i] << "\n";
 			if(tmp_string[i] == "+"){
 				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = set_intersection(answer, tmp_set);
+				b = my::set_intersection(answer, tmp_set);
 				answer = b;
 				i++;
 			}
 			else if(tmp_string[i] == "-"){
 				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = set_union(answer, tmp_set);
+				b = my::set_difference(answer, tmp_set);
 				answer = b;
 				i++;
 			}
 			else if(tmp_string[i] == "/"){
 				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = set_difference(answer, tmp_set);
+				b = my::set_union(answer, tmp_set);
 				answer = b;
 				i++;
 			}
