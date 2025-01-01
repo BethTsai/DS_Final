@@ -35,26 +35,6 @@ vector<string> word_parse(vector<string> tmp_string){
 	return parse_string;
 }
 
-vector<string> split(const string& str, const string& delim) {
-	vector<string> res;
-	if("" == str) return res;
-
-	char * strs = new char[str.length() + 1] ; 
-	strcpy(strs, str.c_str());
-
-	char * d = new char[delim.length() + 1];
-	strcpy(d, delim.c_str());
-
-	char *p = strtok(strs, d);
-	while(p) {
-		string s = p; 
-		res.push_back(s);
-		p = strtok(NULL, d);
-	}
-
-	return res;
-}
-
 set<int> find_set(string &str, Trie *trie){
 	set<int> tmp;
 	if(str[0] == '\"'){
@@ -67,44 +47,7 @@ set<int> find_set(string &str, Trie *trie){
 		tmp = trie->find_pre(str);
 	}
 	else if(str[0] == '<'){
-		set<int> tmpa, tmpb;
-		int len = str.size();
-		vector<string> tmp_string;
-		tmp_string = split(str.substr(1, len-2), "*");
-		int tmp_string_size = tmp_string.size();
-		
-		if(str[1] == '*' && str[len-2] == '*'){
-			tmp = trie->find_wildcard(tmp_string.begin(), tmp_string.end());
-		}
-		else if(str[1] != '*' && str[len-2] == '*'){
-			if(tmp_string_size > 1){
-				tmpa = trie->find_pre(tmp_string[0]);
-				tmpb = trie->find_wildcard(tmp_string.begin()+1, tmp_string.end());
-				tmp = move(my::set_intersection(tmpa, tmpb));
-			}
-			else{
-				tmp = trie->find_pre(tmp_string[0]);
-			}
-		}
-		else if(str[1] == '*' && str[len-2] != '*'){
-			if(tmp_string_size > 1){
-				tmpa = trie->find_suf(tmp_string[tmp_string_size-1]);
-				tmpb = trie->find_wildcard(tmp_string.begin(), tmp_string.end()-1);
-				tmp = move(my::set_intersection(tmpa, tmpb));
-			}
-			else{
-				tmp = trie->find_suf(tmp_string[tmp_string_size-1]);
-			}
-		}
-		else if(str[1] != '*' && str[len-2] != '*'){
-			tmpa = trie->find_pre(tmp_string[0]);
-			tmpb = trie->find_suf(tmp_string[tmp_string_size-1]);
-			tmp = move(my::set_intersection(tmpa, tmpb));
-			if(tmp_string_size > 2){
-				tmpa = trie->find_wildcard(tmp_string.begin()+1, tmp_string.end()-1);
-				tmp = move(my::set_intersection(tmp, tmpa));
-			}
-		}
+		tmp = trie->find_wildcard(str);
 	}
 	return tmp;
 }
