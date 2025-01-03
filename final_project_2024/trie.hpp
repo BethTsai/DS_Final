@@ -32,7 +32,7 @@ public:
 	set<int> find_exact(string str);
 	set<int> find_pre(string str);
 	set<int> find_suf(string str);
-	set<int> find_wildcard(string &str);
+	set<int> find_wildcard(string str);
 	set<int> find_child(Node *root);
 
 	set<Node*> find_substr(Node *root, string &str, int idx);
@@ -131,7 +131,7 @@ set<int> Trie::find_suf(string str){
 	}
 	return find_child(finding);
 }
-set<int> Trie::find_wildcard(string &str){
+set<int> Trie::find_wildcard(string str){
 	int len = str.size();
 	vector<string> tmp_string;
 	tmp_string = split(str.substr(1, len-2), "*");

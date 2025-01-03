@@ -23,7 +23,7 @@ vector<string> getTextFiles(const string& directory) {
     return files;
 }
 
-set<int> find_set(string &str, Trie *trie){
+set<int> find_set(string str, Trie *trie){
 	set<int> tmp;
 	if(str[0] == '\"'){
 		tmp = move(trie->find_exact(str.substr(1, str.size()-2)));
@@ -122,6 +122,8 @@ int main(int argc, char *argv[]){
 
 	while(getline(fi, tmp)){
 		tmp_string = split(tmp, " ");
+		for(auto s : tmp_string)
+			cout << s << '\n';
 
 		set<int> answer, tmp_set, b;
 		answer = find_set(tmp_string[0], &trie);
