@@ -8,7 +8,7 @@
 #include <iostream>
 #include "function.hpp"
 #include "trie.hpp"
-#define DATA_SIZE 10100
+#define DATA_SIZE 10050
 namespace fs = std::filesystem;
 using namespace std;
 
