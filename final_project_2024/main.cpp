@@ -6,7 +6,9 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include "function.hpp"
 #include "trie.hpp"
+#define DATA_SIZE 10050
 namespace fs = std::filesystem;
 using namespace std;
 
@@ -21,39 +23,26 @@ vector<string> getTextFiles(const string& directory) {
     return files;
 }
 
-// string parser : output vector of strings (words) after parsing
-vector<string> word_parse(vector<string> tmp_string){
-	vector<string> parse_string;
-	for(auto& word : tmp_string){
-		string new_str;
-    	for(auto &ch : word){
-			if(isalpha(ch))
-				new_str.push_back(ch);
-		}
-		parse_string.emplace_back(new_str);
-	}
-	return parse_string;
-}
-
 set<int> find_set(string &str, Trie *trie){
 	set<int> tmp;
 	if(str[0] == '\"'){
-		tmp = trie->find_exact(str.substr(1, str.size()-2));
+		tmp = move(trie->find_exact(str.substr(1, str.size()-2)));
 	}
 	else if(str[0] == '*'){
-		tmp = trie->find_suf(str.substr(1, str.size()-2));
+		tmp = move(trie->find_suf(str.substr(1, str.size()-2)));
 	}
 	else if(isalpha(str[0])){
-		tmp = trie->find_pre(str);
+		tmp = move(trie->find_pre(str));
 	}
 	else if(str[0] == '<'){
-		tmp = trie->find_wildcard(str);
+		tmp = move(trie->find_wildcard(str));
 	}
 	return tmp;
 }
 
 
 int main(int argc, char *argv[]){
+	ios::sync_with_stdio(0);
 
     // INPUT :
 	// 1. data directory in data folder
@@ -80,10 +69,10 @@ int main(int argc, char *argv[]){
 
 	// from data_dir get file ....
 	// eg : use 0.txt in data directory
-	// fi.open("data/53.txt", ios::in);
+
 	vector<string> textFiles = getTextFiles(data_dir);
 	vector<string> Article_title;
-	Article_title.resize(10010);
+	Article_title.resize(DATA_SIZE);
 
 	Trie trie;
     // Process each file
@@ -122,39 +111,35 @@ int main(int argc, char *argv[]){
 		}
         fi.close();
     }
-	cout << "Trie built\n";
 
+	cout << "Trie built\n";
+	
 	// OPEN query.txt
 	fi.open(query, ios::in);
 	if(!fi.is_open()){
 		cerr << "Failed to open: " << query << endl;
 	}
+
 	while(getline(fi, tmp)){
 		tmp_string = split(tmp, " ");
-
-		// for(auto s : tmp_string)	cout << s << "\n";
-
 
 		set<int> answer, tmp_set, b;
 		answer = find_set(tmp_string[0], &trie);
 		for(int i = 1; i < tmp_string.size(); i++){
-			cout << tmp_string[i] << "\n";
+
 			if(tmp_string[i] == "+"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_intersection(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_intersection(answer, tmp_set));
 				i++;
 			}
 			else if(tmp_string[i] == "-"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_difference(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_difference(answer, tmp_set));
 				i++;
 			}
 			else if(tmp_string[i] == "/"){
-				tmp_set = find_set(tmp_string[i+1], &trie);
-				b = my::set_union(answer, tmp_set);
-				answer = b;
+				tmp_set = move(find_set(tmp_string[i+1], &trie));
+				answer = move(my::set_union(answer, tmp_set));
 				i++;
 			}
 		}
@@ -168,34 +153,7 @@ int main(int argc, char *argv[]){
 		answer.clear();
 	}
 	cout << "Query processed\n";
-	// fi.open("data/53.txt", ios::in);
-    // // GET TITLENAME
-	// getline(fi, title_name);
 
-    // // GET TITLENAME WORD ARRAY
-    // tmp_string = split(title_name, " ");
-	// vector<string> title = word_parse(tmp_string);
-
-	// for(auto &word : title){
-	// 	cout << word << " ";
-	// }
-
-    // // GET CONTENT LINE BY LINE
-	// while(getline(fi, tmp)){
-
-    //     // GET CONTENT WORD VECTOR
-	// 	tmp_string = split(tmp, " ");
-
-	// 	// PARSE CONTENT
-	// 	vector<string> content = word_parse(tmp_string);
-
-	// 	for(auto &word : content){
-	// 		outputFile << word << endl;
-	// 	}
-	// 	//......
-	// }
-
-    // CLOSE FILE
 	fi.close();
 	outputFile.close();
 }
