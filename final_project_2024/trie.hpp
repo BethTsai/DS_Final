@@ -2,17 +2,8 @@
 #include <vector>
 #include <string>
 #include <set>
-#include <unordered_set>
-#include <execution>
+#include "function.hpp"
 using namespace std;
-
-namespace my {
-	template<class T> set<T> set_union(const set<T> &a, const set<T> &b);
-	set<int> set_intersection(const set<int> &a, const set<int> &b);
-	set<int> set_difference(const set<int> &a, const set<int> &b);
-};
-
-vector<string> split(const string& str, const string& delim);
 
 struct Mark{
 	set<int> title;
@@ -163,7 +154,7 @@ set<int> Trie::find_wildcard(string str){
 
 			for(auto &root : all_sets){
 				if(str[len-2] == '*'){
-					tb = this->find_child(root);
+					tb = move(this->find_child(root));
 					ans = move(my::set_union(ans, tb));
 				}
 				else if(str[len-2] != '*' && root->ptr != nullptr){
@@ -172,12 +163,12 @@ set<int> Trie::find_wildcard(string str){
 			}
 		}
 		else{
-			ans = this->find_pre(tmp_string[0]);
+			ans = move(this->find_pre(tmp_string[0]));
 		}
 	}
 	else if(str[1] == '*'){
 		start_node = this->pre_root;
-		all_sets = this->find_substr(start_node, *begin, 0);
+		all_sets = move(this->find_substr(start_node, *begin, 0));
 
 		for(int i = 1; i < tmp_str_len; i++){
 			for(auto &node : all_sets){
@@ -189,7 +180,7 @@ set<int> Trie::find_wildcard(string str){
 
 		for(auto &root : all_sets){
 			if(str[len-2] == '*'){
-				tb = this->find_child(root);
+				tb = move(this->find_child(root));
 				ans = move(my::set_union(ans, tb));
 			}
 			else if(str[len-2] != '*' && root->ptr != nullptr){
@@ -209,9 +200,8 @@ set<int> Trie::find_child(Node *root){
 		if(root->child[i] == nullptr){
 			continue;
 		}
-		set<int> b = find_child(root->child[i]);
-		tmp = my::set_union(all_sets, b);
-		all_sets = move(tmp);
+		set<int> b = move(find_child(root->child[i]));
+		all_sets = move(my::set_union(all_sets, b));
 	}
 	return all_sets;
 }
@@ -225,13 +215,13 @@ set<Node*> Trie::find_substr(Node *root, string str, int idx){
 	}
 	for(int i = 0; i < 26; i++){
 		if(root->child[i] != nullptr && i == str_data){
-			tmp = find_substr(root->child[i], str, idx+1);
+			tmp = move(find_substr(root->child[i], str, idx+1));
 		}
 		for(auto &i : tmp){
 			all_sets.insert(i);
 		}
 		if(root->child[i] != nullptr && idx == 0){
-			tmp = find_substr(root->child[i], str, 0);
+			tmp = move(find_substr(root->child[i], str, 0));
 		}
 		for(auto &i : tmp){
 			all_sets.insert(i);
@@ -255,52 +245,5 @@ Node* Trie::find_prefix_node(string str){
 	return finding;
 }
 
-template <class T>
-set<T> my::set_union(const set<T> &a, const set<T> &b){
-	set<T> tmp;
-	tmp = a;
-	for(auto &i : b){
-		tmp.insert(i);
-	}
-	return tmp;
-}
 
-set<int> my::set_intersection(const set<int> &a, const set<int> &b){
-	set<int> tmp;
-	for(auto &i : a){
-		if(b.find(i) != b.end()){
-			tmp.insert(i);
-		}
-	}
-	return tmp;
-}
 
-set<int> my::set_difference(const set<int> &a, const set<int> &b){
-	set<int> tmp;
-	for(auto &i : a){
-		if(b.find(i) == b.end()){
-			tmp.insert(i);
-		}
-	}
-	return tmp;
-}
-
-vector<string> split(const string& str, const string& delim) {
-	vector<string> res;
-	if("" == str) return res;
-
-	char * strs = new char[str.length() + 1] ; 
-	strcpy(strs, str.c_str());
-
-	char * d = new char[delim.length() + 1];
-	strcpy(d, delim.c_str());
-
-	char *p = strtok(strs, d);
-	while(p) {
-		string s = p; 
-		res.push_back(s);
-		p = strtok(NULL, d);
-	}
-
-	return res;
-}
