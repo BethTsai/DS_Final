@@ -1,7 +1,7 @@
-"bubble" + "allied" + "bargain"
-"bargain" / "construction"
-"at" / "altogether" + "bottle"
-"possibility" - "highest"
-"decomposition" + "agreement"
-
-
+"Convolutional"
+"construction"
+"decomposition"
+"blank"
+"bring"
+"boring"
+"approach"
