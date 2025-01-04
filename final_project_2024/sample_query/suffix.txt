@@ -1,0 +1,7 @@
+*mid*
+*sub*
+*ir*
+*post*
+*re*
+*pre*
+*super*
