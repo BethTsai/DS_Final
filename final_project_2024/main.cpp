@@ -6,9 +6,11 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include "function.hpp"
 #include "trie.hpp"
 #include "function.hpp"
 #define DATA_SIZE 10010
+
 namespace fs = std::filesystem;
 using namespace std;
 
@@ -47,7 +49,7 @@ int main(int argc, char *argv[]){
 	// 1. data directory in data folder
 	// 2. number of txt files
 	// 3. output route
-    string data_dir = argv[1] + string("/");
+  string data_dir = argv[1] + string("/");
 	string query = string(argv[2]);
 	string output = string(argv[3]);
 
@@ -107,6 +109,7 @@ int main(int argc, char *argv[]){
         fi.close();
     }
 
+
 	// OPEN QUERY.TXT and PARSE =========================================================================
 
 	fi.open(query, ios::in);
@@ -117,7 +120,9 @@ int main(int argc, char *argv[]){
 	while(getline(fi, tmp)){
 		tmp_string = split(tmp, " ");
 
+
 		set<int> answer, tmp_set;
+
 		answer = find_set(tmp_string[0], &trie);
 
 		for(int i = 1; i < tmp_string.size(); i++){
