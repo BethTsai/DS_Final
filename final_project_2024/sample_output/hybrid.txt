@@ -37,7 +37,8 @@ Algebraic geometry of Gaussian Bayesian networks
 Sensor Networks with Random Links: Topology Design for Distributed
 A Topological Glass
 Daemons and DAMA: Their Celestial-Mechanics Interrelations
-Not Found!
+On Punctured Pragmatic Space-Time Codes in Block Fading Channel
+Pseudo-random Puncturing: A Technique to Lower the Error Floor of Turbo
 Not Found!
 Inference on white dwarf binary systems using the first round Mock LISA
 An architecture-based dependability modeling framework using AADL

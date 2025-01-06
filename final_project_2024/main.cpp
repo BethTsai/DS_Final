@@ -12,10 +12,10 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-vector<string> getTextFiles(const string& directory) {
+vector<string> getTextFiles(const string& directory){
     vector<string> files;
-    for(const auto& entry : fs::directory_iterator(directory)) {
-        if(entry.path().extension() == FILE_EXTENSION) {
+    for(const auto& entry : fs::directory_iterator(directory)){
+        if(entry.path().extension() == FILE_EXTENSION){
             files.push_back(entry.path().string());
         }
     }
@@ -119,7 +119,6 @@ int main(int argc, char *argv[]){
 		answer = find_set(tmp_string[0], &trie);
 
 		for(int i = 1; i < tmp_string.size(); i++){
-			cout << tmp_string[i] << "\n";
 			if(tmp_string[i] == "+"){
 				tmp_set = move(find_set(tmp_string[i+1], &trie));
 				answer = move(my::set_intersection(answer, tmp_set));

@@ -1,4 +1,5 @@
-Not Found!
+On Punctured Pragmatic Space-Time Codes in Block Fading Channel
+Pseudo-random Puncturing: A Technique to Lower the Error Floor of Turbo
 Nonequilibrium entropy limiters in lattice Boltzmann methods
 A geometric realization of sl(6,C)
 Construction of initial data for 3+1 numerical relativity
