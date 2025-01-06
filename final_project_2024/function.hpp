@@ -13,9 +13,6 @@ namespace my {
 	set<int> set_difference(const set<int> &a, const set<int> &b);
 };
 
-vector<string> split(const string& str, const string& delim);
-vector<string> word_parse(const vector<string> &tmp_string);
-
 template <class T>
 set<T> my::set_union(const set<T> &a, const set<T> &b){
 	set<T> tmp;
@@ -45,8 +42,9 @@ set<int> my::set_difference(const set<int> &a, const set<int> &b){
 	}
 	return tmp;
 }
+
 // string parser : output vector of strings (words) after parsing
-vector<string> word_parse(const vector<string> &tmp_string){
+vector<string> word_parse(vector<string> tmp_string){
 	vector<string> parse_string;
 	for(auto& word : tmp_string){
 		string new_str;

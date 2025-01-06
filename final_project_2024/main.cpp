@@ -8,15 +8,16 @@
 #include <iostream>
 #include "function.hpp"
 #include "trie.hpp"
-#define DATA_SIZE 10050
+#include "function.hpp"
+#define DATA_SIZE 10010
+
 namespace fs = std::filesystem;
 using namespace std;
 
-// Utility Func
-vector<string> getTextFiles(const string& directory) {
+vector<string> getTextFiles(const string& directory){
     vector<string> files;
-    for(const auto& entry : fs::directory_iterator(directory)) {
-        if(entry.path().extension() == FILE_EXTENSION) {
+    for(const auto& entry : fs::directory_iterator(directory)){
+        if(entry.path().extension() == FILE_EXTENSION){
             files.push_back(entry.path().string());
         }
     }
@@ -43,13 +44,11 @@ set<int> find_set(string &str, Trie *trie){
 
 int main(int argc, char *argv[]){
 	ios::sync_with_stdio(0);
-
     // INPUT :
 	// 1. data directory in data folder
 	// 2. number of txt files
 	// 3. output route
-
-    string data_dir = argv[1] + string("/");
+  string data_dir = argv[1] + string("/");
 	string query = string(argv[2]);
 	string output = string(argv[3]);
 
@@ -59,42 +58,38 @@ int main(int argc, char *argv[]){
 		cout << "Error to open output file\n";
 		return 0;
 	}
-	cout << "Output file opened\n";
 
-	// Read File & Parser Example
+	// Read File & Parser ===============================================================================
 
 	string file, title_name, tmp;
 	fstream fi;
 	vector<string> tmp_string;
 
-	// from data_dir get file ....
-	// eg : use 0.txt in data directory
-
 	vector<string> textFiles = getTextFiles(data_dir);
 	vector<string> Article_title;
 	Article_title.resize(DATA_SIZE);
 
+    // Process each file ===============================================================================
 	Trie trie;
-    // Process each file
     for(const auto& filepath : textFiles){
         fi.open(filepath, ios::in);
         if(!fi.is_open()){
-            cerr << "Failed to open: " << filepath << endl;
+            cerr << "Failed to open: " << filepath << "\n";
             continue;
         }
 		// Extract file name without extension
 		string filename = fs::path(filepath).stem().string();
-		int fileIndex = stoi(filename);
+		int file_idx = stoi(filename);
 
         // GET TITLENAME
         getline(fi, title_name);
-        Article_title[fileIndex] = title_name;
+        Article_title[file_idx] = title_name;
         
 		// GET TITLENAME WORD ARRAY
 		tmp_string = split(title_name, " ");
 		vector<string> title = word_parse(tmp_string);
 		for(const auto& word : title){
-			trie.insert(word, fileIndex);
+			trie.insert(word, file_idx);
 		}
 
 		// GET CONTENT LINE BY LINE
@@ -106,27 +101,29 @@ int main(int argc, char *argv[]){
 			vector<string> content = word_parse(tmp_string);
 
 			for(auto &word : content){
-				trie.insert(word, fileIndex);
+				trie.insert(word, file_idx);
 			}
 		}
         fi.close();
     }
 
-	cout << "Trie built\n";
-	
-	// OPEN query.txt
+
+	// OPEN QUERY.TXT and PARSE =========================================================================
+
 	fi.open(query, ios::in);
 	if(!fi.is_open()){
-		cerr << "Failed to open: " << query << endl;
+		cerr << "Failed to open: " << query << "\n";
 	}
 
 	while(getline(fi, tmp)){
 		tmp_string = split(tmp, " ");
 
-		set<int> answer, tmp_set, b;
-		answer = find_set(tmp_string[0], &trie);
-		for(int i = 1; i < tmp_string.size(); i++){
 
+		set<int> answer, tmp_set;
+
+		answer = find_set(tmp_string[0], &trie);
+
+		for(int i = 1; i < tmp_string.size(); i++){
 			if(tmp_string[i] == "+"){
 				tmp_set = move(find_set(tmp_string[i+1], &trie));
 				answer = move(my::set_intersection(answer, tmp_set));
@@ -143,16 +140,17 @@ int main(int argc, char *argv[]){
 				i++;
 			}
 		}
+
 		if(answer.empty()){
 			outputFile << "Not Found!\n";
 			continue;
 		}
+
 		for(auto &index : answer){
 			outputFile << Article_title[index] << "\n";
 		}
 		answer.clear();
 	}
-	cout << "Query processed\n";
 
 	fi.close();
 	outputFile.close();

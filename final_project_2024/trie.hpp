@@ -204,8 +204,7 @@ set<int> Trie::find_child(Node *root){
 			continue;
 		}
 		set<int> b = move(find_child(root->child[i]));
-		tmp = move(my::set_union(all_sets, b));
-		all_sets = move(tmp);
+		all_sets = move(my::set_union(all_sets, b));
 	}
 	return all_sets;
 }
