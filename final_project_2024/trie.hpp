@@ -1,3 +1,6 @@
+#ifndef TRIE_HPP
+#define TRIE_HPP
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -29,11 +32,11 @@ public:
 	set<int> find_exact(string str);
 	set<int> find_pre(string str);
 	set<int> find_suf(string str);
-	set<int> find_wildcard(string str);
+	set<int> find_wildcard(string &str);
 	set<int> find_child(Node *root);
 
-	set<Node*> find_substr(Node *root, string str, int idx);
-	Node* find_prefix_node(string str);
+	set<Node*> find_substr(Node *root, string &str, int idx);
+	Node* find_prefix_node(string &str);
 	void insert(string str, int label);
 	Trie(){
 		pre_root = new Node;
@@ -92,7 +95,7 @@ set<int> Trie::find_exact(string str){
 		finding = finding->child[str_data];
 	}
 	if(finding != nullptr && finding->ptr != nullptr){
-		tmp = finding->ptr->title;
+		tmp = move(finding->ptr->title);
 	}
 	return tmp;
 }
@@ -128,7 +131,7 @@ set<int> Trie::find_suf(string str){
 	}
 	return find_child(finding);
 }
-set<int> Trie::find_wildcard(string str){
+set<int> Trie::find_wildcard(string &str){
 	int len = str.size();
 	vector<string> tmp_string;
 	tmp_string = split(str.substr(1, len-2), "*");
@@ -194,7 +197,7 @@ set<int> Trie::find_wildcard(string str){
 set<int> Trie::find_child(Node *root){
 	set<int> all_sets, tmp;
 	if(root->ptr != nullptr){
-		all_sets = root->ptr->title;
+		all_sets = move(root->ptr->title);
 	}
 	for(int i = 0; i < 26; i++){
 		if(root->child[i] == nullptr){
@@ -207,7 +210,7 @@ set<int> Trie::find_child(Node *root){
 }
 
 
-set<Node*> Trie::find_substr(Node *root, string str, int idx){
+set<Node*> Trie::find_substr(Node *root, string &str, int idx){
 	set<Node *> all_sets, tmp;
 	int str_data = (str[idx] >= 'A' && str[idx] <= 'Z') ? str[idx] - 'A' : str[idx] - 'a';
 	if(str.size() == idx){
@@ -230,7 +233,7 @@ set<Node*> Trie::find_substr(Node *root, string str, int idx){
 	return all_sets;
 }
 
-Node* Trie::find_prefix_node(string str){
+Node* Trie::find_prefix_node(string &str){
 	int len = size(str);
 	int str_data;
 	Node *finding;
@@ -245,5 +248,4 @@ Node* Trie::find_prefix_node(string str){
 	return finding;
 }
 
-
-
+#endif
