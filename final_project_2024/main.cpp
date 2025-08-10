@@ -14,6 +14,7 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+// Get all txt files' name
 vector<string> getTextFiles(const string& directory){
     vector<string> files;
     for(const auto& entry : fs::directory_iterator(directory)){
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]){
 	string query = string(argv[2]);
 	string output = string(argv[3]);
 
-	// Open output file
+	// OPEN OUTPUT FILE =================================================================================
 	ofstream outputFile(output);
 	if(!outputFile.is_open()){
 		cout << "Error to open output file\n";
@@ -77,6 +78,7 @@ int main(int argc, char *argv[]){
             cerr << "Failed to open: " << filepath << "\n";
             continue;
         }
+
 		// Extract file name without extension
 		string filename = fs::path(filepath).stem().string();
 		int file_idx = stoi(filename);
