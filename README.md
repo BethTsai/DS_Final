@@ -1,1 +1,1 @@
-This is a Final Project of Data Structure.
+This is the Final Project of Data Structure. Use Trie to implement a Simple Search Engine.
